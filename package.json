@@ -1,0 +1,36 @@
+{
+  "name": "@alana/platform-actionsongoogle",
+  "version": "1.0.0",
+  "description": "Actions on google connector for alana bots",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "test": "tsc && mocha",
+    "prepublish": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alana-bot/platform-actionsongoogle.git"
+  },
+  "author": "Adam Juhasz",
+  "license": "MIT",
+  "homepage": "https://alana.cloud",
+  "devDependencies": {
+    "@alana/core": "2.x",
+    "@types/bluebird": "^3.5.0",
+    "@types/body-parser": "^1.16.3",
+    "@types/express": "^4.0.35",
+    "@types/uuid": "^2.0.29",
+    "bluebird": "3.x",
+    "lodash": "4.x"
+  },
+  "peerDependencies": {
+    "bluebird": "3.x",
+    "lodash": "4.x"
+  },
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "uuid": "^3.0.1"
+  }
+}
