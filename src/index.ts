@@ -117,14 +117,19 @@ export default class ActionsOnGoogle implements PlatformMiddleware  {
     const res = response.res;
     if (!response.promise) {
       response.promise = Promise.delay(this.messageTimeoutMs).then(() => {
-        const textMessages = response.messages.filter(message => message.type === 'text').filter((message: Messages.TextMessage) => isSSML(message.text) === false) as Messages.TextMessage[];
-        const concated = `<speak>${textMessages.map(message => `<p>${message.text}</p>`).join('')}</speak>`
-        const googleMessage = mapInternalToGoogle({
-          type: 'text',
-          text: concated,
-          conversation_id: message.conversation_id,
-          id: uuid.v4(),
-        } as Messages.TextMessage);
+        let googleMessage: response;
+        if (response.messages.length > 1) {
+          const textMessages = response.messages.filter(message => message.type === 'text').filter((message: Messages.TextMessage) => isSSML(message.text) === false) as Messages.TextMessage[];
+          const concated = `<speak>${textMessages.map(message => `<p>${message.text}</p>`).join('')}</speak>`
+          googleMessage = mapInternalToGoogle({
+            type: 'text',
+            text: concated,
+            conversation_id: message.conversation_id,
+            id: uuid.v4(),
+          } as Messages.TextMessage);
+        } else {
+          googleMessage = mapInternalToGoogle(response.messages[0]);
+        }
         googleMessage.conversation_token = response.token;
         res.set("Google-Assistant-API-Version", "v1").send(googleMessage);
         delete this.responseMap[message.conversation_id];
