@@ -25,7 +25,7 @@ class Intenter extends IntentGenerator {
         domain: 'ActionsOnGoogle',
         action: this.intentMap[message.id].intent,
         details: {
-          confidence: 1,
+          confidence: this.intentMap[message.id].intent !== 'assistant.intent.action.TEXT' ? 1 : 0,
           arguments: this.intentMap[message.id].arguments
         },
       }
@@ -48,7 +48,7 @@ export default class ActionsOnGoogle implements PlatformMiddleware  {
     promise: Promise<any>;
   }} = {};
   private intentGen: Intenter = new Intenter();
-  public messageTimeoutMs = 200;
+  public messageTimeoutMs = 50;
 
   constructor(theBot: Alana, port: number = 3000, route: string = '/webhook') {
     this.bot = theBot;
@@ -119,7 +119,9 @@ export default class ActionsOnGoogle implements PlatformMiddleware  {
       response.promise = Promise.delay(this.messageTimeoutMs).then(() => {
         let googleMessage: response;
         if (response.messages.length > 1) {
-          const textMessages = response.messages.filter(message => message.type === 'text').filter((message: Messages.TextMessage) => isSSML(message.text) === false) as Messages.TextMessage[];
+          const textMessages = response.messages
+            .filter(message => message.type === 'text')
+            .filter((message: Messages.TextMessage) => isSSML(message.text) === false) as Messages.TextMessage[];
           const concated = `<speak>${textMessages.map(message => `<p>${message.text}</p>`).join('')}</speak>`
           googleMessage = mapInternalToGoogle({
             type: 'text',
