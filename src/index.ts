@@ -50,15 +50,19 @@ export default class ActionsOnGoogle implements PlatformMiddleware  {
   private intentGen: Intenter = new Intenter();
   public messageTimeoutMs = 50;
 
-  constructor(theBot: Alana, port: number = 3000, route: string = '/webhook') {
+  constructor(theBot: Alana, port: number | Express.Express = 3000, route: string = '/webhook') {
     this.bot = theBot;
     this.bot.addPlatform(this);
     this.bot.addIntent(this.intentGen);
-    this.port = port;
+    if (_.isNumber(this.port)) {
+      this.port = port as number;
+      this.expressApp = Express();
+      this.expressApp.use(bodyParser.json());
+    } else {
+      this.expressApp = port as Express.Express;
+    }
     this.route = route;
-    this.expressApp = Express();
-    this.expressApp.use(bodyParser.json());
-    this.expressApp.post(this.route, this.postHandler.bind(this))
+    this.expressApp.post(this.route, this.postHandler.bind(this));
     return this;
   }
 
@@ -75,7 +79,7 @@ export default class ActionsOnGoogle implements PlatformMiddleware  {
         id: rawMessage.user.user_id,
         platform: 'ActionsOnGoogle',
       };
-      
+
       if (this.bot.debugOn) {
         console.log(`Processing ${message.type} message for ${user.id}`);
       }
@@ -91,21 +95,29 @@ export default class ActionsOnGoogle implements PlatformMiddleware  {
   }
 
   public start() {
-    this.server = this.expressApp.listen(this.port, () => {
+    if (this.port) {
+      this.server = this.expressApp.listen(this.port, () => {
+        if (this.bot.debugOn) {
+          console.log(`ActionsOnGoogle platform listening at http://localhost:${this.port}${this.route}`);
+        }
+      });
+    } else {
       if (this.bot.debugOn) {
-        console.log(`ActionsOnGoogle platform listening at http://localhost:${this.port}${this.route}`);
+        console.log(`ActionsOnGoogle platform listening at ${this.route}`);
       }
-    });
+    }
     return Promise.resolve(this);
   }
 
   public stop() {
-    this.server.close(() => {
-      if (this.bot.debugOn) {
-        console.log('ActionsOnGoogle platform stopped');
-      }
-    });
-    this.server = null;
+    if (this.port) {
+      this.server.close(() => {
+        if (this.bot.debugOn) {
+          console.log('ActionsOnGoogle platform stopped');
+        }
+      });
+      this.server = null;
+    }
     return Promise.resolve(this);
   }
 
@@ -133,7 +145,7 @@ export default class ActionsOnGoogle implements PlatformMiddleware  {
           googleMessage = mapInternalToGoogle(response.messages[0]);
         }
         googleMessage.conversation_token = response.token;
-        res.set("Google-Assistant-API-Version", "v1").send(googleMessage);
+        res.set('Google-Assistant-API-Version', 'v1').send(googleMessage);
         delete this.responseMap[message.conversation_id];
       });
     }
