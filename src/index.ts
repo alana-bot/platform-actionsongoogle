@@ -54,7 +54,8 @@ export default class ActionsOnGoogle implements PlatformMiddleware  {
     this.bot = theBot;
     this.bot.addPlatform(this);
     this.bot.addIntent(this.intentGen);
-    if (_.isNumber(this.port)) {
+    console.log(_.isNumber(port));
+    if (_.isNumber(port)) {
       this.port = port as number;
       this.expressApp = Express();
       this.expressApp.use(bodyParser.json());

@@ -17,7 +17,7 @@ export default class ActionsOnGoogle implements PlatformMiddleware {
     private responseMap;
     private intentGen;
     messageTimeoutMs: number;
-    constructor(theBot: Alana, port?: number, route?: string);
+    constructor(theBot: Alana, port?: number | Express.Express, route?: string);
     postHandler(req: Express.Request, res: Express.Response): void;
     start(): Promise<this>;
     stop(): Promise<this>;
