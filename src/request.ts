@@ -1,3 +1,4 @@
+// tslint:disable-next-line:class-name
 export interface request {
   user: User;
   device: Device;
@@ -33,7 +34,7 @@ export interface Location {
 
 export interface Conversation {
   conversation_id: string;
-  type: 0 // 'TYPE_UNSPECIFIED' 
+  type: 0 // 'TYPE_UNSPECIFIED'
       | 1 // 'NEW'
       | 2 // 'ACTIVE'
       | 3 // 'EXPIRED'
@@ -52,8 +53,8 @@ export interface RawInputs {
     seconds: number;
     nanos: number;
   };
-  input_type: 0 //'UNSPECIFIC_INPUT_TYPE' 
-            | 1 // 'TOUCH' 
+  input_type: 0 // 'UNSPECIFIC_INPUT_TYPE'
+            | 1 //  'TOUCH'
             | 2; // 'VOICE'
   query: string;
 }
