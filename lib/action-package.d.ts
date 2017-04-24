@@ -20,11 +20,14 @@ export interface AccountLinking {
 }
 export interface Action {
     description?: string;
-    initialTrigger: Trigger;
-    execution: HttpExecution;
+    initialTrigger: LaunchTrigger | Trigger;
+    httpExecution: HttpExecution;
+}
+export interface LaunchTrigger {
+    intent: 'assistant.intent.action.MAIN';
 }
 export interface Trigger {
-    intent: 'assistant.intent.action.MAIN' | string;
+    intent: string;
     queryPatterns: QueryPattern[];
 }
 export interface QueryPattern {
