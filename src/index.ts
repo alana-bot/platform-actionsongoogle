@@ -16,6 +16,8 @@ import Alana from '@alana/core';
 
 import { request, Inputs } from './request';
 import { response, SpeechResponse } from './response';
+import { ActionPackage } from './action-package';
+export { request, response, ActionPackage};
 
 class Intenter extends IntentGenerator {
   public intentMap: { [message_id: string]: Inputs } = {};
@@ -28,13 +30,13 @@ class Intenter extends IntentGenerator {
           confidence: this.intentMap[message.id].intent !== 'assistant.intent.action.TEXT' ? 1 : 0,
           arguments: this.intentMap[message.id].arguments
         },
-      }
-      return Promise.resolve([intent])
+      };
+      return Promise.resolve([intent]);
     }
   }
 }
 
-// defined at https://developers.google.com/actions/reference/conversation 
+// defined at https://developers.google.com/actions/reference/conversation
 export default class ActionsOnGoogle implements PlatformMiddleware  {
   protected bot: Alana;
   private port: number;
@@ -91,8 +93,12 @@ export default class ActionsOnGoogle implements PlatformMiddleware  {
         promise: null,
       };
       this.intentGen.intentMap[message.id] = rawMessage.inputs[0];
-      this.bot.processMessage(user, message);
+      this.processMessage(user, message);
     }
+  }
+
+  public processMessage(user: BasicUser, message: Message.IncomingMessage) {
+    this.bot.processMessage(user, message);
   }
 
   public start() {
@@ -135,7 +141,7 @@ export default class ActionsOnGoogle implements PlatformMiddleware  {
           const textMessages = response.messages
             .filter(message => message.type === 'text')
             .filter((message: Messages.TextMessage) => isSSML(message.text) === false) as Messages.TextMessage[];
-          const concated = `<speak>${textMessages.map(message => `<p>${message.text}</p>`).join('')}</speak>`
+          const concated = `<speak>${textMessages.map(message => `<p>${message.text}</p>`).join('')}</speak>`;
           googleMessage = mapInternalToGoogle({
             type: 'text',
             text: concated,
@@ -188,7 +194,7 @@ export function mapInternalToGoogle(message: Message.OutgoingMessage): response 
             intent: 'assistant.intent.action.TEXT'
           }],
         }]
-      } as response
+      } as response;
 
     default:
       return null;
