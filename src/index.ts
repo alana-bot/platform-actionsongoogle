@@ -69,36 +69,37 @@ export default class ActionsOnGoogle implements PlatformMiddleware  {
     return this;
   }
 
-  public postHandler(req: Express.Request, res: Express.Response) {
+  public postHandler(req: Express.Request, res: Express.Response, args?: any) {
     const rawMessage: request = req.body;
     if (this.bot.debugOn) {
       console.log(`Recieved message`);
       console.log(util.inspect(rawMessage, { depth: null }));
     }
     const message: Message.IncomingMessage = mapGoogleToInternal(rawMessage);
-    if (message !== null) {
-      const user: BasicUser = {
-        _platform: this,
-        id: rawMessage.user.user_id,
-        platform: 'ActionsOnGoogle',
-      };
-
-      if (this.bot.debugOn) {
-        console.log(`Processing ${message.type} message for ${user.id}`);
-      }
-      this.responseMap[message.conversation_id] = {
-        res: res,
-        token: rawMessage.conversation.conversation_token,
-        messages: [],
-        promise: null,
-      };
-      this.intentGen.intentMap[message.id] = rawMessage.inputs[0];
-      this.processMessage(user, message);
+    if (message === null) {
+      return Promise.reject(new Error('Bad message'));
     }
+    const user: BasicUser = {
+      _platform: this,
+      id: rawMessage.user.user_id,
+      platform: 'ActionsOnGoogle',
+    };
+
+    if (this.bot.debugOn) {
+      console.log(`Processing ${message.type} message for ${user.id}`);
+    }
+    this.responseMap[message.conversation_id] = {
+      res: res,
+      token: rawMessage.conversation.conversation_token,
+      messages: [],
+      promise: null,
+    };
+    this.intentGen.intentMap[message.id] = rawMessage.inputs[0];
+    return this.processMessage(user, message, args);
   }
 
-  public processMessage(user: BasicUser, message: Message.IncomingMessage) {
-    this.bot.processMessage(user, message);
+  public processMessage(user: BasicUser, message: Message.IncomingMessage, args?: any) {
+    return this.bot.processMessage(user, message);
   }
 
   public start() {

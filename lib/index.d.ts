@@ -20,8 +20,8 @@ export default class ActionsOnGoogle implements PlatformMiddleware {
     private intentGen;
     messageTimeoutMs: number;
     constructor(theBot: Alana, port?: number | Express.Express, route?: string);
-    postHandler(req: Express.Request, res: Express.Response): void;
-    processMessage(user: BasicUser, message: Message.IncomingMessage): void;
+    postHandler(req: Express.Request, res: Express.Response, args?: any): Promise<any>;
+    processMessage(user: BasicUser, message: Message.IncomingMessage, args?: any): Promise<void>;
     start(): Promise<this>;
     stop(): Promise<this>;
     send<U extends User>(user: U, message: Message.OutgoingMessage): Promise<this>;
