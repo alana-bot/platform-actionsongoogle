@@ -65,11 +65,11 @@ export default class ActionsOnGoogle implements PlatformMiddleware  {
       this.expressApp = port as Express.Express;
     }
     this.route = route;
-    this.expressApp.post(this.route, this.postHandler.bind(this));
+    this.expressApp.post(this.route, (req, res) => this.postHandler(req, res));
     return this;
   }
 
-  public postHandler(req: Express.Request, res: Express.Response, args?: any) {
+  public postHandler(req: Express.Request, res: Express.Response, args: any = {}) {
     const rawMessage: request = req.body;
     if (this.bot.debugOn) {
       console.log(`Recieved message`);

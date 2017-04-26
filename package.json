@@ -1,6 +1,6 @@
 {
   "name": "@alana/platform-actionsongoogle",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Actions on google connector for alana bots",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
