@@ -95,6 +95,9 @@ export default class ActionsOnGoogle implements PlatformMiddleware  {
       promise: null,
     };
     this.intentGen.intentMap[message.id] = rawMessage.inputs[0];
+    if (rawMessage.inputs[0].intent !== 'assistant.intent.action.TEXT') {
+      args.intent = rawMessage.inputs[0].intent;
+    }
     return this.processMessage(user, message, args);
   }
 
