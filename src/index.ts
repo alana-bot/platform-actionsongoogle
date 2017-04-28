@@ -96,12 +96,14 @@ export default class ActionsOnGoogle implements PlatformMiddleware  {
     };
     this.intentGen.intentMap[message.id] = rawMessage.inputs[0];
     if (rawMessage.inputs[0].intent !== 'assistant.intent.action.TEXT') {
-      args.intent = rawMessage.inputs[0].intent;
+      args.intents = convertAONGIntent(rawMessage.inputs);
+    } else {
+      args.intents = [];
     }
     return this.processMessage(user, message, args);
   }
 
-  public processMessage(user: BasicUser, message: Message.IncomingMessage, args?: any) {
+  public processMessage(user: BasicUser, message: Message.IncomingMessage, args?: any & { intents: Intent[] }) {
     return this.bot.processMessage(user, message);
   }
 
@@ -163,6 +165,20 @@ export default class ActionsOnGoogle implements PlatformMiddleware  {
     response.messages.push(message);
     return Promise.resolve(this);
   }
+}
+
+export function convertAONGIntent(inputs: Inputs[]): Intent[] {
+  return inputs.map(input => {
+    const alanaIntent: Intent = {
+        domain: 'ActionsOnGoogle',
+        action: input.intent,
+        details: {
+          confidence: input.intent !== 'assistant.intent.action.TEXT' ? 1 : 0,
+          arguments: input.arguments
+        },
+      };
+    return alanaIntent;
+  });
 }
 
 export function mapGoogleToInternal(message: request): Message.TextMessage | Message.GreetingMessage {
